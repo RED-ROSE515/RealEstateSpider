@@ -11,12 +11,12 @@ from env_utils import load_env_file, get_db_config_from_env
 
 class NewsSpider(scrapy.Spider):
     name = "multihousing_news"
-    start_urls = ["https://www.multihousingnews.com/latest-news/page/1/"]  
+    start_urls = ["https://www.multihousingnews.com/latest-news/page/101/"]  
     
     def __init__(self, *args, **kwargs):
         super(NewsSpider, self).__init__(*args, **kwargs)
         self.scraper = MultihousingScraper()
-        self.page_limit = kwargs.get('page_limit', 1)
+        self.page_limit = kwargs.get('page_limit', 200)
         self.brief_links = []
         self.collected_data = []
         
@@ -46,7 +46,7 @@ class NewsSpider(scrapy.Spider):
                 self.logger.warning("Missing some database settings. Check your .env file or command line arguments.")
         
     def start_requests(self):  
-        start_page = 1
+        start_page = 101
         end_page = int(self.page_limit)
         
         for page in range(start_page, end_page + 1):
@@ -64,7 +64,7 @@ class NewsSpider(scrapy.Spider):
 
     def parse_brief_list(self, response):
         """Parse the list of briefs on a page"""
-        page_num = response.meta.get('page_num', 1)
+        page_num = response.meta.get('page_num', 101)
         self.logger.info(f"Processing page {page_num}")
         
         # Use MultihousingScraper to parse brief links from response text

@@ -64,7 +64,57 @@ scrapy crawl credaily_news -a save_to_db=True -a db_host=your-aws-hostname.rds.a
 
 Command-line arguments will override settings from the `.env` file.
 
-### Saving Existing JSON Data to AWS PostgreSQL
+# Saving Scraped Data to PostgreSQL
+
+This script saves scraped data from MultifamilyDive, CRE Daily, and Multihousing to a PostgreSQL database.
+
+## Prerequisites
+
+Make sure to install the required packages:
+
+```bash
+pip install psycopg2-binary python-dotenv
+```
+
+### Using Command Line Arguments
+
+You can also provide database credentials directly via command line arguments.
+
+## Usage
+
+### Running with .env configuration:
+
+```bash
+python save_to_aws.py --multifamily-file "multifamilydive_articles.json" --credaily-file "credaily_articles.json" --multihousing-file "multihousing_articles.json"
+```
+
+### Running with command line arguments:
+
+```bash
+python save_to_aws.py --multifamily-file "multifamilydive_articles.json" --credaily-file "credaily_articles.json" --multihousing-file "multihousing_articles.json" --host "your-aws-host" --database "your-db-name" --user "your-username" --password "your-password"
+```
+
+### Running with specific data sources:
+
+You can also run the script with just one or two of the data sources:
+
+```bash
+# Save only Multihousing data
+python save_to_aws.py --multihousing-file "multihousing_articles.json"
+
+# Save both CRE Daily and MultifamilyDive data
+python save_to_aws.py --credaily-file "credaily_articles.json" --multifamily-file "multifamilydive_articles.json"
+```
+
+## Table Schemas
+
+The script will create the necessary tables in your PostgreSQL database if they don't exist:
+
+1. `multifamilydive_articles` - For MultifamilyDive scraped data
+2. `credaily_articles` - For CRE Daily scraped data
+3. `multihousing_articles` - For Multihousing scraped data
+
+Each table includes columns for the article title, link, summary, author, date, categories, content, and more.
 
 After scraping data to JSON files using the scraper modules, you can upload the data to AWS PostgreSQL using the `save_to_aws.py` script:
 
@@ -133,10 +183,3 @@ cre_scraper.save_to_postgres(briefs_data, db_config)
 | categories | TEXT               | Comma-separated categories |
 | content    | TEXT               | Full article content       |
 | created_at | TIMESTAMP          | Record creation timestamp  |
-
-## Security Notes
-
-- Store your database credentials securely
-- Consider using environment variables for sensitive information
-- Create a database user with appropriate permissions
-- Consider using AWS Secrets Manager for production deployments
